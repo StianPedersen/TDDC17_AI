@@ -1,3 +1,5 @@
+from asyncore import ExitNow, socket_map
+from distutils.log import ERROR
 from lab1.liuvacuum import *
 
 DEBUG_OPT_DENSEWORLDMAP = False
@@ -99,10 +101,13 @@ class MyVacuumAgent(Agent):
 
     def __init__(self, world_width, world_height, log):
         super().__init__(self.execute)
-        self.initial_random_actions = 10
-        self.iteration_counter = 15*15*2
+        self.initial_random_actions = 0
+        self.iteration_counter = 20*20*2
         self.state = MyAgentState(world_width, world_height)
         self.log = log
+
+        # My variables
+        self.path_taken = []
 
     def move_to_random_start_position(self, bump):
         action = random()
@@ -185,14 +190,108 @@ class MyVacuumAgent(Agent):
         # Debug
         self.state.print_world_debug()
 
-        # Decide action
+        # Functions
+        def check_square(sq):
+            if sq == AGENT_STATE_UNKNOWN:
+                return False
+            else:
+                return True
+
+        def front_visited():
+            if self.state.direction == AGENT_DIRECTION_NORTH:
+                return check_square(self.state.world[self.state.pos_x][self.state.pos_y - 1])
+
+            if self.state.direction == AGENT_DIRECTION_EAST:
+                return check_square(self.state.world[self.state.pos_x+1][self.state.pos_y])
+
+            if self.state.direction == AGENT_DIRECTION_SOUTH:
+                return check_square(self.state.world[self.state.pos_x][self.state.pos_y+1])
+
+            if self.state.direction == AGENT_DIRECTION_WEST:
+                return check_square(self.state.world[self.state.pos_x-1][self.state.pos_y])
+            return True
+
+        def right_visited():
+            if self.state.direction == AGENT_DIRECTION_NORTH:
+                return check_square(self.state.world[self.state.pos_x+1][self.state.pos_y])
+
+            if self.state.direction == AGENT_DIRECTION_EAST:
+                return check_square(self.state.world[self.state.pos_x][self.state.pos_y+1])
+
+            if self.state.direction == AGENT_DIRECTION_SOUTH:
+                return check_square(self.state.world[self.state.pos_x-1][self.state.pos_y])
+
+            if self.state.direction == AGENT_DIRECTION_WEST:
+                return check_square(self.state.world[self.state.pos_x][self.state.pos_y-1])
+            return False
+
+        def left_visited():
+            if self.state.direction == AGENT_DIRECTION_NORTH:
+                return check_square(self.state.world[self.state.pos_x-1][self.state.pos_y])
+
+            if self.state.direction == AGENT_DIRECTION_EAST:
+                return check_square(self.state.world[self.state.pos_x][self.state.pos_y-1])
+
+            if self.state.direction == AGENT_DIRECTION_SOUTH:
+                return check_square(self.state.world[self.state.pos_x+1][self.state.pos_y])
+
+            if self.state.direction == AGENT_DIRECTION_WEST:
+                return check_square(self.state.world[self.state.pos_x][self.state.pos_y+1])
+            return False
+
+        def go_forward():
+            self.state.last_action = ACTION_FORWARD
+            self.path_taken.append(self.state.direction)
+            return ACTION_FORWARD
+
+        def go_right():
+            self.state.last_action = ACTION_TURN_RIGHT
+            self.state.direction = (self.state.direction + 1) % 4
+            # self.path_taken.append(self.state.direction)
+            return ACTION_TURN_RIGHT
+
+        def go_left():
+            self.state.last_action = ACTION_TURN_LEFT
+            self.state.direction = (self.state.direction + 3) % 4
+            # self.path_taken.append(self.state.direction)
+            return ACTION_TURN_LEFT
+
+        def obtain_opposite(ghost_dir):
+            if ghost_dir == 0 and self.state.direction == 2:
+                return True
+            if ghost_dir == 1 and self.state.direction == 3:
+                return True
+            if ghost_dir == 2 and self.state.direction == 0:
+                return True
+            if ghost_dir == 3 and self.state.direction == 1:
+                return True
+            return False
+
+            # Decide action
         if dirt:
             self.log("DIRT -> choosing SUCK action!")
             self.state.last_action = ACTION_SUCK
             return ACTION_SUCK
-        elif bump:
-            self.state.last_action = ACTION_NOP
-            return ACTION_NOP
         else:
-            self.state.last_action = ACTION_FORWARD
-            return ACTION_FORWARD
+            if bump:
+                self.path_taken.pop()
+
+            if front_visited() is False:
+                return go_forward()
+            elif right_visited() is False:
+                return go_right()
+            elif left_visited() is False:
+                return go_left()
+            else:
+                if len(self.path_taken) != 0:
+                    ghost_dir = self.path_taken[-1]
+                    while not obtain_opposite(ghost_dir):
+                        self.state.last_action = ACTION_TURN_RIGHT
+                        self.state.direction = (self.state.direction + 1) % 4
+                        return ACTION_TURN_RIGHT
+                    self.path_taken.pop()
+                    self.state.last_action = ACTION_FORWARD
+                    return ACTION_FORWARD
+                self.iteration_counter = 0
+                self.state.last_action = ACTION_NOP
+                return ACTION_NOP
