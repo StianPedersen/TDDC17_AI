@@ -246,14 +246,27 @@ class MyVacuumAgent(Agent):
 
         def go_right():
             self.state.last_action = ACTION_TURN_RIGHT
-            self.state.direction = (self.state.direction + 1) % 4
-            # self.path_taken.append(self.state.direction)
+            if self.state.direction == AGENT_DIRECTION_NORTH:
+                self.state.direction = AGENT_DIRECTION_EAST
+            if self.state.direction == AGENT_DIRECTION_EAST:
+                self.state.direction = AGENT_DIRECTION_SOUTH
+            if self.state.direction == AGENT_DIRECTION_SOUTH:
+                self.state.direction = AGENT_DIRECTION_WEST
+            if self.state.direction == AGENT_DIRECTION_WEST:
+                self.state.direction = AGENT_DIRECTION_NORTH
+
             return ACTION_TURN_RIGHT
 
         def go_left():
             self.state.last_action = ACTION_TURN_LEFT
-            self.state.direction = (self.state.direction + 3) % 4
-            # self.path_taken.append(self.state.direction)
+            if self.state.direction == AGENT_DIRECTION_NORTH:
+                self.state.direction = AGENT_DIRECTION_WEST
+            if self.state.direction == AGENT_DIRECTION_WEST:
+                self.state.direction = AGENT_DIRECTION_SOUTH
+            if self.state.direction == AGENT_DIRECTION_SOUTH:
+                self.state.direction = AGENT_DIRECTION_EAST
+            if self.state.direction == AGENT_DIRECTION_EAST:
+                self.state.direction = AGENT_DIRECTION_NORTH
             return ACTION_TURN_LEFT
 
         def obtain_opposite(ghost_dir):
