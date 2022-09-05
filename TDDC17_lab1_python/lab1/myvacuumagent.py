@@ -1,5 +1,6 @@
 from asyncore import ExitNow, socket_map
 from distutils.log import ERROR
+from agents import Direction
 from lab1.liuvacuum import *
 
 DEBUG_OPT_DENSEWORLDMAP = False
@@ -102,7 +103,7 @@ class MyVacuumAgent(Agent):
     def __init__(self, world_width, world_height, log):
         super().__init__(self.execute)
         self.initial_random_actions = 0
-        self.iteration_counter = 20*20*2
+        self.iteration_counter = 15*15*2
         self.state = MyAgentState(world_width, world_height)
         self.log = log
 
@@ -192,13 +193,13 @@ class MyVacuumAgent(Agent):
 
         # Functions
         def check_square(sq):
-            if sq == AGENT_STATE_UNKNOWN:
+            if sq == AGENT_STATE_UNKNOWN:                    
                 return False
             else:
                 return True
 
         def front_visited():
-            if self.state.direction == AGENT_DIRECTION_NORTH:
+            if self.state.direction == AGENT_DIRECTION_NORTH:   
                 return check_square(self.state.world[self.state.pos_x][self.state.pos_y - 1])
 
             if self.state.direction == AGENT_DIRECTION_EAST:
@@ -248,37 +249,42 @@ class MyVacuumAgent(Agent):
             self.state.last_action = ACTION_TURN_RIGHT
             if self.state.direction == AGENT_DIRECTION_NORTH:
                 self.state.direction = AGENT_DIRECTION_EAST
-            if self.state.direction == AGENT_DIRECTION_EAST:
+
+            elif self.state.direction == AGENT_DIRECTION_EAST:
                 self.state.direction = AGENT_DIRECTION_SOUTH
-            if self.state.direction == AGENT_DIRECTION_SOUTH:
+
+            elif self.state.direction == AGENT_DIRECTION_SOUTH:
                 self.state.direction = AGENT_DIRECTION_WEST
-            if self.state.direction == AGENT_DIRECTION_WEST:
+
+            elif self.state.direction == AGENT_DIRECTION_WEST:
                 self.state.direction = AGENT_DIRECTION_NORTH
 
             return ACTION_TURN_RIGHT
+
 
         def go_left():
             self.state.last_action = ACTION_TURN_LEFT
             if self.state.direction == AGENT_DIRECTION_NORTH:
                 self.state.direction = AGENT_DIRECTION_WEST
-            if self.state.direction == AGENT_DIRECTION_WEST:
+            elif self.state.direction == AGENT_DIRECTION_WEST:
                 self.state.direction = AGENT_DIRECTION_SOUTH
-            if self.state.direction == AGENT_DIRECTION_SOUTH:
+            elif self.state.direction == AGENT_DIRECTION_SOUTH:
                 self.state.direction = AGENT_DIRECTION_EAST
-            if self.state.direction == AGENT_DIRECTION_EAST:
+            elif self.state.direction == AGENT_DIRECTION_EAST:
                 self.state.direction = AGENT_DIRECTION_NORTH
             return ACTION_TURN_LEFT
 
-        def obtain_opposite(ghost_dir):
-            if ghost_dir == 0 and self.state.direction == 2:
+        def obtain_opposite(tmp_dir):
+            if tmp_dir == 0 and self.state.direction == 2:
                 return True
-            if ghost_dir == 1 and self.state.direction == 3:
+            if tmp_dir == 1 and self.state.direction == 3:
                 return True
-            if ghost_dir == 2 and self.state.direction == 0:
+            if tmp_dir == 2 and self.state.direction == 0:
                 return True
-            if ghost_dir == 3 and self.state.direction == 1:
+            if tmp_dir == 3 and self.state.direction == 1:
                 return True
             return False
+
 
             # Decide action
         if dirt:
@@ -297,10 +303,10 @@ class MyVacuumAgent(Agent):
                 return go_left()
             else:
                 if len(self.path_taken) != 0:
-                    ghost_dir = self.path_taken[-1]
-                    while not obtain_opposite(ghost_dir):
-                        self.state.last_action = ACTION_TURN_RIGHT
-                        self.state.direction = (self.state.direction + 1) % 4
+                    ######### NEED TO CHECK WHERE WE ẂANNA GO
+                    tmp_dir = self.path_taken[-1]                  
+                    while not obtain_opposite(tmp_dir):
+                        go_right()
                         return ACTION_TURN_RIGHT
                     self.path_taken.pop()
                     self.state.last_action = ACTION_FORWARD
