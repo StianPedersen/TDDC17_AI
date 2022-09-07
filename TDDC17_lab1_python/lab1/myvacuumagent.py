@@ -102,13 +102,15 @@ class MyVacuumAgent(Agent):
 
     def __init__(self, world_width, world_height, log):
         super().__init__(self.execute)
-        self.initial_random_actions = 0
-        self.iteration_counter = 15*15*2
+        self.initial_random_actions = 10
+        self.iteration_counter = 15*15*2*2*2*2
         self.state = MyAgentState(world_width, world_height)
         self.log = log
 
         # My variables
         self.path_taken = []
+        self.path_home = []
+        self.home_found = False
 
     def move_to_random_start_position(self, bump):
         action = random()
@@ -193,7 +195,7 @@ class MyVacuumAgent(Agent):
 
         # Functions
         def check_square(sq):
-            if sq == AGENT_STATE_UNKNOWN:                    
+            if sq == AGENT_STATE_UNKNOWN or sq == AGENT_STATE_HOME:                    
                 return False
             else:
                 return True
@@ -202,47 +204,50 @@ class MyVacuumAgent(Agent):
             if self.state.direction == AGENT_DIRECTION_NORTH:   
                 return check_square(self.state.world[self.state.pos_x][self.state.pos_y - 1])
 
-            if self.state.direction == AGENT_DIRECTION_EAST:
+            elif self.state.direction == AGENT_DIRECTION_EAST:
                 return check_square(self.state.world[self.state.pos_x+1][self.state.pos_y])
 
-            if self.state.direction == AGENT_DIRECTION_SOUTH:
+            elif self.state.direction == AGENT_DIRECTION_SOUTH:
                 return check_square(self.state.world[self.state.pos_x][self.state.pos_y+1])
 
-            if self.state.direction == AGENT_DIRECTION_WEST:
+            elif self.state.direction == AGENT_DIRECTION_WEST:
                 return check_square(self.state.world[self.state.pos_x-1][self.state.pos_y])
-            return True
+            
 
         def right_visited():
             if self.state.direction == AGENT_DIRECTION_NORTH:
                 return check_square(self.state.world[self.state.pos_x+1][self.state.pos_y])
 
-            if self.state.direction == AGENT_DIRECTION_EAST:
+            elif self.state.direction == AGENT_DIRECTION_EAST:
                 return check_square(self.state.world[self.state.pos_x][self.state.pos_y+1])
 
-            if self.state.direction == AGENT_DIRECTION_SOUTH:
+            elif self.state.direction == AGENT_DIRECTION_SOUTH:
                 return check_square(self.state.world[self.state.pos_x-1][self.state.pos_y])
 
-            if self.state.direction == AGENT_DIRECTION_WEST:
+            elif self.state.direction == AGENT_DIRECTION_WEST:
                 return check_square(self.state.world[self.state.pos_x][self.state.pos_y-1])
-            return False
+            
 
         def left_visited():
             if self.state.direction == AGENT_DIRECTION_NORTH:
                 return check_square(self.state.world[self.state.pos_x-1][self.state.pos_y])
 
-            if self.state.direction == AGENT_DIRECTION_EAST:
+            elif self.state.direction == AGENT_DIRECTION_EAST:
                 return check_square(self.state.world[self.state.pos_x][self.state.pos_y-1])
 
-            if self.state.direction == AGENT_DIRECTION_SOUTH:
+            elif self.state.direction == AGENT_DIRECTION_SOUTH:
                 return check_square(self.state.world[self.state.pos_x+1][self.state.pos_y])
 
-            if self.state.direction == AGENT_DIRECTION_WEST:
+            elif self.state.direction == AGENT_DIRECTION_WEST:
                 return check_square(self.state.world[self.state.pos_x][self.state.pos_y+1])
-            return False
+            
 
         def go_forward():
             self.state.last_action = ACTION_FORWARD
             self.path_taken.append(self.state.direction)
+            if self.home_found is True:
+                self.path_home.append(self.state.direction)
+
             return ACTION_FORWARD
 
         def go_right():
@@ -258,7 +263,6 @@ class MyVacuumAgent(Agent):
 
             elif self.state.direction == AGENT_DIRECTION_WEST:
                 self.state.direction = AGENT_DIRECTION_NORTH
-
             return ACTION_TURN_RIGHT
 
 
@@ -292,8 +296,18 @@ class MyVacuumAgent(Agent):
             self.state.last_action = ACTION_SUCK
             return ACTION_SUCK
         else:
+
+            if self.state.pos_x == 1 and self.state.pos_y == 1:
+                self.log("FOUND HOME")
+                self.home_found = True
+                
+
             if bump:
-                self.path_taken.pop()
+                if len(self.path_taken) != 0:
+                    self.path_taken.pop()
+                    self.log("bump")
+                if len(self.path_home) != 0:
+                    self.path_home.pop()
 
             if front_visited() is False:
                 return go_forward()
@@ -305,12 +319,42 @@ class MyVacuumAgent(Agent):
                 if len(self.path_taken) != 0:
                     ######### NEED TO CHECK WHERE WE ẂANNA GO
                     tmp_dir = self.path_taken[-1]                  
-                    while not obtain_opposite(tmp_dir):
-                        go_right()
-                        return ACTION_TURN_RIGHT
+                    if not obtain_opposite(tmp_dir):
+                        self.log("SESESESESESESEE")
+                        return go_right()
+                        #return ACTION_TURN_RIGHT
                     self.path_taken.pop()
+                    if len(self.path_home) != 0:
+                        self.path_home.pop()
+                    self.state.last_action = ACTION_FORWARD
+                    self.move_x = self.state.pos_x - 1
+                    self.move_y = self.state.pos_y - 1
+                    return ACTION_FORWARD
+
+                    
+                if self.state.pos_x != 1:
+                    self.log("EHEHEEHHEEHEHEE")
+                   
+                    if self.state.direction != AGENT_DIRECTION_WEST:
+                        return go_right()
+                    if bump:
+                        self.log(self.iteration_counter)
+                        self.iteration_counter = 0
+                        self.state.last_action = ACTION_NOP
+                        return ACTION_NOP
                     self.state.last_action = ACTION_FORWARD
                     return ACTION_FORWARD
+                if self.state.pos_y != 1 :
+                    if self.state.direction != AGENT_DIRECTION_NORTH:
+                        return go_right()
+                    if bump:
+                        self.log(self.iteration_counter)
+                        self.iteration_counter = 0
+                        self.state.last_action = ACTION_NOP
+                        return ACTION_NOP    
+                    self.state.last_action = ACTION_FORWARD
+                    return ACTION_FORWARD
+                self.log(self.iteration_counter)
                 self.iteration_counter = 0
                 self.state.last_action = ACTION_NOP
                 return ACTION_NOP
