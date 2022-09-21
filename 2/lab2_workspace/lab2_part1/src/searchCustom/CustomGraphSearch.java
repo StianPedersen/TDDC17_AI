@@ -85,7 +85,7 @@ public class CustomGraphSearch implements SearchObject {
 				SearchNode child = new SearchNode(childStates.get(i), current_node);
 				if(p.isGoalState(child.getState())){
 					System.out.println("GOAL: " + childStates.get(i));
-					path = child.getPathFromRoot(); //Return childState?
+					path = child.getPathFromRoot();
 					return path;
 				}
 				else if(!explored.contains(child)){
