@@ -3,6 +3,8 @@ package searchCustom;
 import java.util.ArrayList;
 import java.util.HashSet;
 
+import org.w3c.dom.Node;
+
 import searchShared.NodeQueue;
 import searchShared.Problem;
 import searchShared.SearchObject;
@@ -70,33 +72,36 @@ public class CustomGraphSearch implements SearchObject {
 		/* Note: Returning an empty path signals that no path exists */
 
 		if (p.isGoalState(startState)) {
+			path = new SearchNode(startState).getPathFromRoot(); 
 			return path;
 		} 
 		explored.add(new SearchNode(startState));
 		//SearchNode current_node = new SearchNode(frontier.removeFirst().getState());
-		//System.out.println(current_node.getState().m_x);
-		//System.out.println(current_node.getState().m_y);
 		while(!frontier.isEmpty()){
-			SearchNode current_node = new SearchNode(frontier.removeFirst().getState());
+			SearchNode current_node = frontier.removeFirst();
 			//System.out.println(current_node.getState().m_x + current_node.getState().m_y);
 			ArrayList<GridPos> childStates = p.getReachableStatesFrom(current_node.getState());
+
 			for(int i=0; i<childStates.size(); i++){
 				
 				SearchNode child = new SearchNode(childStates.get(i), current_node);
 				if(p.isGoalState(child.getState())){
-					System.out.println("GOAL: " + childStates.get(i));
-					path = child.getPathFromRoot();
+					path = child.getPathFromRoot(); 
 					return path;
 				}
 				else if(!explored.contains(child)){
-					System.out.println("added childStates: " + childStates.get(i));
 					explored.add(child);
-					frontier.addNodeToBack(child);
+					if (insertFront){
+						frontier.addNodeToBack(child);
+					}
+					else{
+						frontier.addNodeToFront(child);
+
+					}
+				
 				}
 			}
 		}
-
-		
 		return path;
 	}
 
