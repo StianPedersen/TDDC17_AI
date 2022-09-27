@@ -76,10 +76,8 @@ public class CustomGraphSearch implements SearchObject {
 			return path;
 		} 
 		explored.add(new SearchNode(startState));
-		//SearchNode current_node = new SearchNode(frontier.removeFirst().getState());
 		while(!frontier.isEmpty()){
 			SearchNode current_node = frontier.removeFirst();
-			//System.out.println(current_node.getState().m_x + current_node.getState().m_y);
 			ArrayList<GridPos> childStates = p.getReachableStatesFrom(current_node.getState());
 
 			for(int i=0; i<childStates.size(); i++){
@@ -92,11 +90,10 @@ public class CustomGraphSearch implements SearchObject {
 				else if(!explored.contains(child)){
 					explored.add(child);
 					if (insertFront){
-						frontier.addNodeToBack(child);
+						frontier.addNodeToFront(child);
 					}
 					else{
-						frontier.addNodeToFront(child);
-
+						frontier.addNodeToBack(child);
 					}
 				
 				}
