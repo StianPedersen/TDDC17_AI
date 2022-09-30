@@ -6,9 +6,8 @@ public class StateAndReward {
 
 		/* TODO: IMPLEMENT THIS FUNCTION */
 
-		String state ="ourState_" + discretize(angle, 4, -1.57, 1.57);
-		
-		/*if(angle == 0) {
+		String state ="";
+		if(angle == 0) {
 			state = "UpStraight";
 		}
 		else if(angle < 0 && angle >= -1.57) {
@@ -23,24 +22,7 @@ public class StateAndReward {
 		else if(angle > 1.57 && angle <= 3.14) {
 			state = "DownRight";
 		}
-		if(vy == 0) {
-			state +="_VyStill";
-		}
-		else if(vy < 0) {
-			state +="_VyUp";
-		}
-		else if(vy > 0) {
-			state +="_VyDown";
-		}
-		if(vx == 0) {
-			state +="_VxStill";
-		}
-		else if(vx < 0) {
-			state +="_VxLeft";
-		}
-		else if(vx > 0) {
-			state +="_VxRight";
-		}*/
+		
 		return state;
 	}
 
@@ -49,8 +31,8 @@ public class StateAndReward {
 
 		/* TODO: IMPLEMENT THIS FUNCTION */
 		
-		double reward = 3.14 - Math.abs(angle);
-		
+		double reward = 0;
+
 		return reward;
 	}
 

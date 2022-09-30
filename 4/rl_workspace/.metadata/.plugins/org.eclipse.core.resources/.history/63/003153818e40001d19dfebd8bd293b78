@@ -6,7 +6,7 @@ public class StateAndReward {
 
 		/* TODO: IMPLEMENT THIS FUNCTION */
 
-		String state ="ourState_" + discretize(angle, 4, -1.57, 1.57);
+		String state ="ourState_" + discretize(angle, 4, -3.14, 3.14);
 		
 		/*if(angle == 0) {
 			state = "UpStraight";
@@ -49,7 +49,7 @@ public class StateAndReward {
 
 		/* TODO: IMPLEMENT THIS FUNCTION */
 		
-		double reward = 3.14 - Math.abs(angle);
+		double reward = 0;
 		
 		return reward;
 	}
