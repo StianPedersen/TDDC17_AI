@@ -43,12 +43,9 @@ public class TutorialController extends Controller {
     	/*System.out.println("VY: " + vy.getValue());
     	System.out.println("VX: " + vx.getValue());
     	System.out.println("ANGLE: " + angle.getValue());*/
-    	if(vy.getValue()>3.6) {
-    		System.out.println("VY: " + vy.getValue());
-    		leftRocket.setBursting(true);
-    		rightRocket.setBursting(true);
-    		
-    	}
+
+    	System.out.println("VY: " + vy.getValue());
+
 			
     }
 

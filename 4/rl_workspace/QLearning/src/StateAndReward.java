@@ -8,21 +8,7 @@ public class StateAndReward {
 
 		String state ="ourState_" + discretize(angle, 4, -1.57, 1.57);
 		
-		/*if(angle == 0) {
-			state = "UpStraight";
-		}
-		else if(angle < 0 && angle >= -1.57) {
-			state = "UpperLeft";
-		}
-		else if(angle < -1.57 && angle >= -3.14) {
-			state = "DownLeft";
-		}
-		else if(angle > 0 && angle <= 1.57) {
-			state = "UpperRight";
-		}
-		else if(angle > 1.57 && angle <= 3.14) {
-			state = "DownRight";
-		}
+		/*
 		if(vy == 0) {
 			state +="_VyStill";
 		}
@@ -59,7 +45,7 @@ public class StateAndReward {
 
 		/* TODO: IMPLEMENT THIS FUNCTION */
 
-		String state = "OneStateToRuleThemAll2";
+		String state = "HoverState_" + discretize(angle, 4, -1.57, 1.57) +"_vy_" + discretize2(vy,2,0.5,-0.5) +"_vx_"+ discretize2(vx,2,0.5,-0.5);
 		
 		return state;
 	}
@@ -68,8 +54,17 @@ public class StateAndReward {
 	public static double getRewardHover(double angle, double vx, double vy) {
 
 		/* TODO: IMPLEMENT THIS FUNCTION */
+		double reward_angle = 3.14 - Math.abs(angle);
+		double reward_vx = 5-Math.abs(vx);
+		double reward_vy = 5-Math.abs(vy);
+		if(vx > 5 || vx<-5) {
+			reward_vx = 0;
+		}
+		if(vy > 0.5 || vy<-0.5) {
+			reward_vy = 0;
+		}
 		
-		double reward = 0;
+		double reward = reward_angle + reward_vx + reward_vy;
 
 		return reward;
 	}
