@@ -86,7 +86,7 @@ public class StateAndReward {
 		return (int) (ratio * (nrValues - 2)) + 1;
 	}
 
-	// ///////////////////////////////////////////////////////////
+	// //////////////////////////////////////////////////////////
 	// discretize2() performs a uniform discretization of the
 	// value parameter.
 	// It returns an integer between 0 and nrValues-1.
