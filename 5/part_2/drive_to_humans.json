@@ -1,0 +1,35 @@
+{
+  "children": [
+    {
+      "children": [],
+      "common_params": {},
+      "name": "drive-to",
+      "params": {
+        "p": {
+          "rostype": "Point",
+          "x": -1.9498180884085725,
+          "y": 1.9902991591355632,
+          "z": 0
+        }
+      }
+    },
+    {
+      "children": [],
+      "common_params": {},
+      "name": "drive-to",
+      "params": {
+        "p": {
+          "rostype": "Point",
+          "x": -2.9498180884085747,
+          "y": 3.9902991591355614,
+          "z": 0
+        }
+      }
+    }
+  ],
+  "common_params": {},
+  "name": "seq",
+  "params": {
+    "repeat-count": 1
+  }
+}
